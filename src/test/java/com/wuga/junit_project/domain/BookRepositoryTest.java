@@ -1,6 +1,7 @@
 package com.wuga.junit_project.domain;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import java.util.List;
 
@@ -74,5 +75,18 @@ public class BookRepositoryTest {
         // 검증
         assertEquals(title, bookEntity.getTitle());
         assertEquals(author, bookEntity.getAuthor());
+    }
+
+    @Sql("classpath:db/tableInit.sql")
+    @Test
+    public void 책삭제_테스트() throws Exception {
+        // 데이터 준비
+        Long bookId = 1L;
+
+        // 테스트 실행
+        bookRepository.deleteById(bookId);
+
+        // 검증
+        assertFalse(bookRepository.findById(1L).isPresent());
     }
 }
