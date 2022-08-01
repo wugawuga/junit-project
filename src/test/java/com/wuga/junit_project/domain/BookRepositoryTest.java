@@ -89,4 +89,29 @@ public class BookRepositoryTest {
         // 검증
         assertFalse(bookRepository.findById(1L).isPresent());
     }
+
+    @Sql("classpath:db/tableInit.sql")
+    @Test
+    public void 책수정_테스트() throws Exception {
+        // 데이터 준비
+        Long bookId = 1L;
+        String title = "junitUpdate";
+        String author = "wuga";
+        Book book = new Book(bookId, title, author);
+
+        // 테스트 실행
+        Book bookEntity = bookRepository.save(book);
+        bookRepository.findAll().stream()
+                .forEach((findBook) -> {
+                    System.out.println("BookRepositoryTest.책수정_테스트()");
+                    System.out.println(findBook.getId());
+                    System.out.println(findBook.getTitle());
+                    System.out.println(findBook.getAuthor());
+                });
+
+        // 검증
+        assertEquals(bookId, bookEntity.getId());
+        assertEquals(author, bookEntity.getAuthor());
+        assertEquals(title, bookEntity.getTitle());
+    }
 }
