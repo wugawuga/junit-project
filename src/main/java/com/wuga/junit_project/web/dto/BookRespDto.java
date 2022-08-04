@@ -7,13 +7,13 @@ import lombok.NoArgsConstructor;
 
 @Getter
 @NoArgsConstructor
-public class BookResDto {
+public class BookRespDto {
     
     private Long id;
     private String title;
     private String author;
 
-    public BookResDto toDto(Book bookEntity) {
+    public BookRespDto toDto(Book bookEntity) {
         this.id = bookEntity.getId();
         this.title = bookEntity.getTitle();
         this.author = bookEntity.getAuthor();
