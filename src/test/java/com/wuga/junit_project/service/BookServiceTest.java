@@ -1,67 +1,40 @@
 package com.wuga.junit_project.service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import com.wuga.junit_project.domain.Book;
 import com.wuga.junit_project.domain.BookRepository;
+import com.wuga.junit_project.util.MailSenderSutb;
 import com.wuga.junit_project.web.dto.BookRespDto;
 import com.wuga.junit_project.web.dto.BookSaveReqDto;
 
-import lombok.RequiredArgsConstructor;
-
-@RequiredArgsConstructor
-@Service
+@DataJpaTest
 public class BookServiceTest {
+
+    @Autowired
+    private BookRepository bookRepository;
     
-    private final BookRepository bookRepository;
+    // 문제점: 서비스만 테스트하고 싶은데 레포지토리 레이어도 같이 테스트
+    @Test
+    public void 책등록하기_테스트() {
+        // given
+        BookSaveReqDto dto = new BookSaveReqDto();
+        dto.setTitle("title");
+        dto.setAuthor("wuga");
 
-    // 1. 책등록
-    @Transactional(rollbackFor = RuntimeException.class)
-    public BookRespDto 책등록하기_테스트(BookSaveReqDto bookSaveReqDto) {
+        // stub
+        MailSenderSutb mailSenderSutb = new MailSenderSutb();
 
-        Book bookEntity = bookRepository.save(bookSaveReqDto.toEntity());
-        return new BookRespDto().toDto(bookEntity);
-    }
+        // when
+        BookService bookService = new BookService(bookRepository, mailSenderSutb);
+        BookRespDto bookRespDto = bookService.책등록하기(dto);
 
-    // 2. 책목록보기
-    @Transactional
-    public List<BookRespDto> 책목록보기() {
-        return bookRepository.findAll().stream()
-            .map(new BookRespDto()::toDto)
-            .collect(Collectors.toList());
-    }
-
-    // 3. 책하나
-    public BookRespDto 책하나보기(Long id) {
-        Optional<Book> book = bookRepository.findById(id);
-        if(book.isPresent()) {
-            return new BookRespDto().toDto(book.get());
-        }else {
-            throw new RuntimeException("해당 책을 찾을 수 없습니다");
-        }
-    }
-
-    // 4. 책삭제
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void 책삭제(Long id) {
-        bookRepository.deleteById(id);
-    }
-
-    // 5. 책수정
-    @Transactional(rollbackFor = RuntimeException.class)
-    public void 책수정(Long id, BookSaveReqDto dto) {
-        Optional<Book> bookEntity = bookRepository.findById(id);
-        if(bookEntity.isPresent()) {
-            Book book = bookEntity.get();
-            book.update(dto.getTitle(), dto.getAuthor());
-        }else {
-            throw new RuntimeException("해당 책을 찾을 수 없습니다");
-        }
+        // then
+        assertEquals(dto.getTitle(), bookRespDto.getTitle());
+        assertEquals(dto.getAuthor(), bookRespDto.getAuthor());
     }
 
 }
