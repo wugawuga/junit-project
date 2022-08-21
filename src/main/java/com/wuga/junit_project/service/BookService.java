@@ -18,13 +18,13 @@ import lombok.RequiredArgsConstructor;
 @Service
 @RequiredArgsConstructor
 public class BookService {
-    
+
     private final BookRepository bookRepository;
     private final MailSender mailSender;
 
     // 1. 책등록
     @Transactional(rollbackFor = RuntimeException.class)
-    public BookRespDto 책등록하기_테스트(BookSaveReqDto bookSaveReqDto) {
+    public BookRespDto 책등록하기(BookSaveReqDto bookSaveReqDto) {
         Book bookEntity = bookRepository.save(bookSaveReqDto.toEntity());
         if (bookEntity != null) {
             if (!mailSender.send()) {
@@ -38,16 +38,16 @@ public class BookService {
     @Transactional
     public List<BookRespDto> 책목록보기() {
         return bookRepository.findAll().stream()
-            .map(new BookRespDto()::toDto)
-            .collect(Collectors.toList());
+                .map(new BookRespDto()::toDto)
+                .collect(Collectors.toList());
     }
 
     // 3. 책하나
     public BookRespDto 책하나보기(Long id) {
         Optional<Book> book = bookRepository.findById(id);
-        if(book.isPresent()) {
+        if (book.isPresent()) {
             return new BookRespDto().toDto(book.get());
-        }else {
+        } else {
             throw new RuntimeException("해당 책을 찾을 수 없습니다");
         }
     }
@@ -62,10 +62,10 @@ public class BookService {
     @Transactional(rollbackFor = RuntimeException.class)
     public void 책수정(Long id, BookSaveReqDto dto) {
         Optional<Book> bookEntity = bookRepository.findById(id);
-        if(bookEntity.isPresent()) {
+        if (bookEntity.isPresent()) {
             Book book = bookEntity.get();
             book.update(dto.getTitle(), dto.getAuthor());
-        }else {
+        } else {
             throw new RuntimeException("해당 책을 찾을 수 없습니다");
         }
     }
