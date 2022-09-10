@@ -38,7 +38,7 @@ public class BookService {
     @Transactional
     public List<BookRespDto> 책목록보기() {
         return bookRepository.findAll().stream()
-                .map(new BookRespDto()::toDto)
+                .map((book) -> new BookRespDto().toDto(book))
                 .collect(Collectors.toList());
     }
 
